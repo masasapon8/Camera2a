@@ -8,7 +8,8 @@ class ViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     /// 撮影ボタン押下時に呼ばれる
     
 
-    @IBOutlet weak var cameraView: UIView!
+    
+    @IBOutlet weak var cameraView: UIImageView!
     
     var captureSesssion: AVCaptureSession!
     var stillImageOutput: AVCapturePhotoOutput?
@@ -21,12 +22,12 @@ class ViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         stillImageOutput = AVCapturePhotoOutput()
         
         // 解像度の設定
-        captureSesssion.sessionPreset = AVCaptureSessionPreset1920x1080
+        captureSesssion.sessionPreset = AVCaptureSession.Preset.hd1920x1080
         
-        let device = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
+        let device = AVCaptureDevice.default(for: AVMediaType.video)
         
         do {
-            let input = try AVCaptureDeviceInput(device: device)
+            let input = try AVCaptureDeviceInput(device: (device)!)
             
             // 入力
             if (captureSesssion.canAddInput(input)) {
@@ -58,16 +59,30 @@ class ViewController: UIViewController, AVCapturePhotoCaptureDelegate {
 }
     /// 撮影ボタン押下時に呼ばれる
     
+   
+    
+    
     @IBAction func cameraButtonTapped(_ sender: Any) {
+   
     
     // カメラの設定
-        let settingsForMonitoring = AVCapturePhotoSettings()
+    let settingsForMonitoring = AVCapturePhotoSettings()
         settingsForMonitoring.flashMode = .auto
         settingsForMonitoring.isAutoStillImageStabilizationEnabled = true
         settingsForMonitoring.isHighResolutionPhotoEnabled = false
-        
+    
         // 撮影
         stillImageOutput?.capturePhoto(with: settingsForMonitoring, delegate: self)
+        //　撮影が完了時した時に呼ばれる
+        func imagePickerController(_ imagePicker: UIImagePickerController,
+                                   didFinishPickingMediaWithInfo info: [String : Any]) {
+            
+            if let pickedImage = info[UIImagePickerControllerOriginalImage]
+                as? UIImage {
+               
+                cameraView.image = pickedImage
+                
+            }
 }
     /// カメラで撮影完了時にフォトライブラリに保存
     func photoOutput(_ captureOutput: AVCapturePhotoOutput, didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?, previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: Error?) {
@@ -82,5 +97,6 @@ class ViewController: UIViewController, AVCapturePhotoCaptureDelegate {
             // フォトライブラリに保存
             UIImageWriteToSavedPhotosAlbum(image!, nil, nil, nil)
         }
-  }
+      }
+    }
 }
